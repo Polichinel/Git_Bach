@@ -175,14 +175,40 @@ out_PITF <- stargazer(model_f3, model_c1, model_r3,
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 
-# Du mangler stadig Odds ration - men det må komme senere.
+# Du mangler stadig Odds ratio - men det må komme senere -> du har konstrueret dem nedenfor..
+model_f3_or <- exp(model_f3$coefficients) # odds ratio mf3
+model_c1_or <- exp(model_c1$coefficients) # odds ratio mc1
+model_r3_or <- exp(model_r3$coefficients) # odds ratio mr3
 
+# Reproducere deres model -> nu (kun) med odds ratio..
+out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
+                      coef = list(model_f3_or,model_c1_or,model_r3_or),   
+                      type = "text", 
+                      out="PITF_out.htm",
+                      omit = "sftptv2a6",
+                      model.numbers = F,
+                      column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
+
+# Du mangler stadig korrekte ci - men det ser sådan agtigt ud:
+# Correct CIs
+## CI.vector <- exp(confint(mylogit))
+## cbind(OR = OR.vector, CI.vector)
+## stargazer(mylogit, coef = list(OR.vector), ci = T, 
+## ci.custom = list(CI.vector), single.row = T, type = "text")
+
+
+# Nu skal de bare "merges"
 
 # Forudsigeler (lige nu rod) ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 sub_s3 <- subset(PITF_data, PITF_data$sample == 3)
-sub_s3$pred <- predict(model_f3)
+sub_s3$pred <- predict(model_f3) # forudsagte sansynligheder
+model_f3_or <- exp(model_f3$coefficients) # odds ratio.
+
+
+
+sort(sub_s3$or)
 
 out_of_s <- subset(sub_s3, sub_s3$year > 1994)
 sort(out_of_s$pred, decreasing = T)
@@ -190,7 +216,7 @@ sort(out_of_s$pred, decreasing = T)
 
 
 
-#..
+#..+++++++++++++
 
 
 
