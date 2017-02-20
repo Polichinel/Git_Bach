@@ -175,23 +175,29 @@ out_PITF <- stargazer(model_f3, model_c1, model_r3,
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 
-# Du mangler stadig Odds ratio - men det må komme senere -> du har konstrueret dem nedenfor..
+# Konstruere odds ratio (til stargazer de findes allerede i summmary)
 model_f3_or <- exp(model_f3$coefficients) # odds ratio mf3
 model_c1_or <- exp(model_c1$coefficients) # odds ratio mc1
 model_r3_or <- exp(model_r3$coefficients) # odds ratio mr3
 
+# Konstruere korrekte ci til odds ratio
+model_f3_ci  <- exp(confint(model_f3))
+model_c1_ci  <- exp(confint(model_c1))
+model_r3_ci  <- exp(confint(model_r3))
+
 # Reproducere deres model -> nu (kun) med odds ratio..
 out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
-                      coef = list(model_f3_or,model_c1_or,model_r3_or),   
+                      coef = list(model_f3_or,model_c1_or,model_r3_or),
+                      ci.custom = list(model_f3_ci, model_c1_ci, model_r3_ci),
                       type = "text", 
-                      out="PITF_out.htm",
+                      out="PITF_out_or.htm",
                       omit = "sftptv2a6",
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 
-# Du mangler stadig korrekte ci - men det ser sådan agtigt ud:
-# Correct CIs
-## CI.vector <- exp(confint(mylogit))
+# Spledes en model med odds ratio og korrekte ci; men stadigt ikke samlet model...
+
+# rest til ci - måske det skal bruges.
 ## cbind(OR = OR.vector, CI.vector)
 ## stargazer(mylogit, coef = list(OR.vector), ci = T, 
 ## ci.custom = list(CI.vector), single.row = T, type = "text")
