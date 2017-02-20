@@ -168,7 +168,14 @@ library(stargazer)
 
 # Reproducere deres model -> de valgte modeller er således (på Goldstones foranledning) f3, c1 og r3
 # Goldstone forklare at det er disse der har "mediean accuracy for each type of instabilitt[...]" s. 196
-out_PITF <- stargazer(model_f3, model_c1, model_r3, 
+out_PITF <- stargazer(model_f3, model_c1, model_r3,
+                      covariate.labels = c("Partial Autocracy",
+                                           "Partial Democracy with Factionalisme",
+                                           "Partial democracy without Factionalism",
+                                           "Full Democracy",
+                                           "Infant Mortality",
+                                           "Armed Conflict in 4+ Bordering States",
+                                           "State-Led Discrimination"),
                       type = "text", 
                       out="PITF_out.htm",
                       omit = "sftptv2a6",
@@ -189,6 +196,13 @@ model_r3_ci  <- exp(confint(model_r3))
 out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
                       coef = list(model_f3_or,model_c1_or,model_r3_or),
                       ci.custom = list(model_f3_ci, model_c1_ci, model_r3_ci),
+                      covariate.labels = c("Partial Autocracy",
+                                           "Partial Democracy with Factionalisme",
+                                           "Partial democracy without Factionalism",
+                                           "Full Democracy",
+                                           "Infant Mortality",
+                                           "Armed Conflict in 4+ Bordering States",
+                                           "State-Led Discrimination"),
                       type = "text", 
                       out="PITF_out_or.htm",
                       omit = "sftptv2a6",
@@ -202,8 +216,7 @@ out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
 ## stargazer(mylogit, coef = list(OR.vector), ci = T, 
 ## ci.custom = list(CI.vector), single.row = T, type = "text")
 
-
-# Nu skal de bare "merges"
+# Nu skal de bare "merges" -> og der er stadigt lidt med layoutet..
 
 # Forudsigeler (lige nu rod) ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
