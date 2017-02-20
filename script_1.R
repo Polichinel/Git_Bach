@@ -163,7 +163,7 @@ summary(model_r3)
 library(stargazer)
 ? stargazer
 
-OR.vector <- exp(model_f3$coefficients)
+# Ting du ikke har styr på endnu: OR.vector <- exp(model_f3$coefficients)
 
 
 # Reproducere deres model -> de valgte modeller er således (på Goldstones foranledning) f3, c1 og r3
@@ -177,8 +177,75 @@ out_PITF <- stargazer(model_f3, model_c1, model_r3,
 
 # Du mangler stadig Odds ration - men det må komme senere.
 
-# Forudsigeler - i forsøg på at finde resultaterne fra table 2
-PITF_data$test1 <- predict(model_f3)
-head(test1)
 
+# Forudsigeler (lige nu rod) ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+sub_s3 <- subset(PITF_data, PITF_data$sample == 3)
+sub_s3$pred <- predict(model_f3)
+
+out_of_s <- subset(sub_s3, sub_s3$year > 1994)
+sort(out_of_s$pred, decreasing = T)
+
+
+
+
+#..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#  i forsøg på at finde resultaterne fra table 2
+test_df <- subset(PITF_data, sample == 1)
+
+
+# Det kunne du hav gjort meget tidligere -> det kan være du skal gå tilbage og gøre det..
+
+# Konstruere predict værdier
+test_df$test_predict <- predict(model_f3)
+test_df2 <- subset(test_df, test_df$year > 1994)
+
+sort(test_df$test_predict, decreasing = T, test_df$year > 1994)
+
+str(test_df)
+# tænke pause
+
+# fuld dem med ustabilitet
+
+test_fd_us <- subset(PITF_data, PITF_data$sftptv2a2 == 1 & PITF_data$sftpcons == 1 & PITF_data$sample == 3)
+# jeps
+
+test_fd_us1 <- subset(test_df, test_df$sftptv2a2 == 1 & test_df$sftpcons == 1)
+
+
+?predict
+
+
+test_us <- subset(test_df, test_df$test_predict > 0.2300 & test_df$sftpcons == 1)
+
+test_df$test_predict2 <- predict(model_f3)
+
+str(model_f3)
+
+test_df$test_residuals <- residuals(model_f3)
+
+test_df$test_OR <- exp(as.numeric(model_f3$test_predict2))
+
+
+test_df$test_OR <- exp(model_f3$coefficients)
+
+(model_f3)
 
