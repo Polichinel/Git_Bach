@@ -178,7 +178,10 @@ out_PITF <- stargazer(model_f3, model_c1, model_r3,
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 
-# Med odds ratio i stedet for log odds  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Med odds ratio i stedet for log odds (kun for model f3 indtil vidre) ++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 # Konstruere odds ratio (til stargazer de findes allerede i summmary)
 model_f3_or <- exp(model_f3$coefficients) # odds ratio mf3
 model_c1_or <- exp(model_c1$coefficients) # odds ratio mc1
@@ -200,12 +203,14 @@ out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
                                            "Infant Mortality",
                                            "Armed Conflict in 4+ Bordering States",
                                            "State-Led Discrimination"),
+                      p.auto = F,
                       type = "text", 
                       out="PITF_out_or.htm",
                       omit = "sftptv2a6",
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
-# nu problemer med p-værdierne..
+
+# nu INGEN problemer med p-værdierne, efter p.auto = F
 # Spledes en model med odds ratio og korrekte ci; men stadigt ikke samlet model...
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -330,10 +335,32 @@ model_r3_rc_fd_ci
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+# kan du lave output med alle de tre ny modeller med korrekte p?
+# GOOOOO!
+stargazer(model_f3_rc_fd, model_c1_rc_fd, model_r3_rc_fd,
+         covariate.labels = c("Partial Autocracy",
+                              "Partial Democracy with Factionalisme",
+                              "Partial democracy without Factionalism",
+                              "Full Autocracy",
+                              "Infant Mortality",
+                              "Armed Conflict in 4+ Bordering States",
+                              "State-Led Discrimination"),
+         dep.var.labels = "Odds Ratio regarding:",
+         dep.var.caption = "",
+         coef = list(model_f3_rc_fd_or,model_c1_rc_fd_or,model_r3_rc_fd_or),
+         ci.custom = list(model_f3_rc_fd_ci, model_c1_rc_fd_ci, model_r3_rc_fd_ci),
+         p.auto = F,
+         type = "text", 
+         out="PITF_out_rc_fd.htm",
+         omit = "sftptv2a6",
+         model.numbers = F,
+         column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 
-
-
-
+# OR er korrekte og nu også ci. og p efter p.auto = F
+# Modellen er (substansielt set) færdig. nu layout..
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
