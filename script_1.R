@@ -30,11 +30,9 @@ PITF_data$stratidb <- stratid[PITF_data$sample == 2]
 PITF_data$stratidc <- stratid[PITF_data$sample == 3]
 # meget elegant - men nu gentages værdien blot for alle obs... Se hvad der sker..
 
-
-# MODELLER
-# Første stata kode..
-# clogit sftpcons sftptv2a3 sftptv2a4 sftptv2a5 sftptv2a2 sftptv2a6 logim maccat disp4cat if sample==1 & glb_ind=="Y", group(stratida) 
-#Laver nu data frame
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# MODELLER ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 library(survival)
 # for clogit
@@ -159,12 +157,10 @@ model_r3 <- clogit(sftpcons ~ sftptv2a3 +
 summary(model_r3) 
 # Igen problemer med sftptv2a6
 
-# output ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# outputs for modellerne f3, c1 og r3 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 library(stargazer)
-? stargazer
-
-# Ting du ikke har styr på endnu: OR.vector <- exp(model_f3$coefficients)
-
 
 # Reproducere deres model -> de valgte modeller er således (på Goldstones foranledning) f3, c1 og r3
 # Goldstone forklare at det er disse der har "mediean accuracy for each type of instabilitt[...]" s. 196
@@ -182,6 +178,7 @@ out_PITF <- stargazer(model_f3, model_c1, model_r3,
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 
+# Med odds ratio i stedet for log odds  +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Konstruere odds ratio (til stargazer de findes allerede i summmary)
 model_f3_or <- exp(model_f3$coefficients) # odds ratio mf3
 model_c1_or <- exp(model_c1$coefficients) # odds ratio mc1
@@ -209,8 +206,186 @@ out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 # nu problemer med p-værdierne..
-
 # Spledes en model med odds ratio og korrekte ci; men stadigt ikke samlet model...
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Modeller f3 med FD som ref.cat. ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+model_f3_rc_fd <- clogit(sftpcons ~ sftptv2a3 + 
+                     sftptv2a4 + 
+                     sftptv2a5 + 
+                     sftptv2a1 +  # nu full auto a1 i stedet for full demo a2
+                     sftptv2a6 + 
+                     logim + 
+                     maccat + 
+                     disp4cat + 
+                     strata(stratidc),
+                   PITF_data, subset = sample==3 & glb_ind=="Y")
+
+stargazer(model_f3_rc_fd,
+          covariate.labels = c("Partial Autocracy",
+                               "Partial Democracy with Factionalisme",
+                               "Partial democracy without Factionalism",
+                               "Full Autocracy",
+                               "Infant Mortality",
+                               "Armed Conflict in 4+ Bordering States",
+                               "State-Led Discrimination"),
+          type = "text", 
+          out="PITF_out_rc_fd.htm",
+          omit = "sftptv2a6")
+# Her ser vi at kun PDF er sig anderledes fra FD (***) - det er fint og vigtigt.
+# Men inft. mort, conflikt in.., og discr. har self ikke ændret sig.
+# OR og ci:
+
+model_f3_rc_fd_or <- exp(model_f3_rc_fd$coefficients) # odds ratio mf3_rc_df
+model_f3_rc_fd_ci  <- exp(confint(model_f3_rc_fd))
+
+model_f3_rc_fd_or
+model_f3_rc_fd_ci
+
+# for pdf odds ratio på 13.85 og ci på 3.45 - 55.53. 
+# dvs. oddsne for at at et PDF falder er altså 3 til 55 gange større end i et FD
+# Bedste bud er er oddsne er 13.85 gange større i PDF frem for FD
+# Stop.
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Modeller c1 med FD som ref.cat. ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+model_c1_rc_fd <- clogit(sftpcons ~ sftptv2a3 + 
+                     sftptv2a4 + 
+                     sftptv2a5 + 
+                     sftptv2a1 +  # nu full auto a1 i stedet for full demo a2
+                     sftptv2a6 + 
+                     logim + 
+                     maccat + 
+                     disp4cat + 
+                     strata(stratida),
+                   PITF_data, subset = sample==1 & cwar_ind=="Y")
+
+stargazer(model_c1_rc_fd,
+          covariate.labels = c("Partial Autocracy",
+                               "Partial Democracy with Factionalisme",
+                               "Partial democracy without Factionalism",
+                               "Full Autocracy",
+                               "Infant Mortality",
+                               "Armed Conflict in 4+ Bordering States",
+                               "State-Led Discrimination"),
+          type = "text", 
+          out="PITF_out_rc_fd.htm",
+          omit = "sftptv2a6")
+
+# Samme resultat som f3
+
+model_c1_rc_fd_or <- exp(model_c1_rc_fd$coefficients) # odds ratio mc1_rc_df
+model_c1_rc_fd_ci  <- exp(confint(model_c1_rc_fd))
+
+model_c1_rc_fd_or
+model_c1_rc_fd_ci
+
+# for pdf odds ratio på 16.52 og ci på 2.2 - 123.57. 
+# dvs. oddsne for borgerkrig i PDF er altså 2 til 123 gange større end i et FD
+# Bedste bud er er oddsne er 16.51 gange større i PDF frem for FD
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Modeller r3 med FD som ref.cat. ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+model_r3_rc_fd <- clogit(sftpcons ~ sftptv2a3 + 
+                     sftptv2a4 + 
+                     sftptv2a5 + 
+                     sftptv2a1 + # nu full auto a1 i stedet for full demo a2
+                     sftptv2a6 + 
+                     logim + 
+                     maccat + 
+                     disp4cat + 
+                     strata(stratidc),
+                   PITF_data, subset = sample==3 & reg_ind=="Y")
+
+stargazer(model_r3_rc_fd,
+          covariate.labels = c("Partial Autocracy",
+                               "Partial Democracy with Factionalisme",
+                               "Partial democracy without Factionalism",
+                               "Full Autocracy",
+                               "Infant Mortality",
+                               "Armed Conflict in 4+ Bordering States",
+                               "State-Led Discrimination"),
+          type = "text", 
+          out="PITF_out_rc_fd.htm",
+          omit = "sftptv2a6")
+
+# Samme resultat som f3 og c1
+
+model_r3_rc_fd_or <- exp(model_r3_rc_fd$coefficients) # odds ratio mr3_rc_df
+model_r3_rc_fd_ci  <- exp(confint(model_r3_rc_fd))
+
+model_r3_rc_fd_or
+model_r3_rc_fd_ci
+
+# for pdf odds ratio på 44.69 og ci på 4 - 499.31. 
+# dvs. oddsne for adverse regimechange i PDF er altså 4 til 500 gange større end i et FD
+# Bedste bud er er oddsne er 44.69 gange større i PDF frem for FD
+
+# stop++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+model_r3 <- clogit(sftpcons ~ sftptv2a3 + 
+                     sftptv2a4 + 
+                     sftptv2a5 + 
+                     sftptv2a2 + 
+                     sftptv2a6 + 
+                     logim + 
+                     maccat + 
+                     disp4cat + 
+                     strata(stratidc),
+                   PITF_data, subset = sample==3 & reg_ind=="Y")
+
+
+
+# AME +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+library(mfx)
+??mfx
+logitmfx(model_f3,data = PITF_data)
+
+model_t <- glm(sftpcons ~ sftptv2a3 + 
+                     sftptv2a4 + 
+                     sftptv2a5 + 
+                     sftptv2a2 + 
+                     sftptv2a6 + 
+                     logim + 
+                     maccat + 
+                   disp4cat, family = binomial, data = PITF_data)
+summary(model_t)
+logitmfx(sftpcons ~ sftptv2a3 + 
+           sftptv2a4 + 
+           sftptv2a5 + 
+           sftptv2a2 + 
+           sftptv2a6 + 
+           logim + 
+           maccat + 
+           disp4cat, data = PITF_data)
+# hmmm +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 # rest til ci - måske det skal bruges.
 ## cbind(OR = OR.vector, CI.vector)
@@ -218,8 +393,10 @@ out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
 ## ci.custom = list(CI.vector), single.row = T, type = "text")
 
 # Nu skal de bare "merges" -> og der er stadigt lidt med layoutet..
+# Du skal havde demokrati som ref.cat
+# Du skal havde AME
 
-# Fulde demokratier der har oplevet konflkiter:
+# Fulde demokratier der har oplevet konflkiter: +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # fuld dem med ustabilitet
 konflikt_fd <- subset(PITF_data, PITF_data$sftptv2a2 == 1 & PITF_data$sftpcons == 1 & PITF_data$sample == 3)
 konflikt_fd$sftgname
@@ -236,7 +413,7 @@ Adverse_rc_fd <- subset(konflikt_fd, konflikt_fd$reg_ind == "Y")
 # Chile ses i dette dataset som pdf, men Venezuela gik fra pd til fd et sted mellem 1970 0g 76.. Hvornår var det sidste fald.
 # Det kunne klæde dig godt med en omskrivning af Polity IV 2015 data..
 
-
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Forudsigeler (lige nu rod) ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
