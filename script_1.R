@@ -208,6 +208,7 @@ out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
                       omit = "sftptv2a6",
                       model.numbers = F,
                       column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
+# nu problemer med p-værdierne..
 
 # Spledes en model med odds ratio og korrekte ci; men stadigt ikke samlet model...
 
@@ -217,6 +218,24 @@ out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
 ## ci.custom = list(CI.vector), single.row = T, type = "text")
 
 # Nu skal de bare "merges" -> og der er stadigt lidt med layoutet..
+
+# Fulde demokratier der har oplevet konflkiter:
+# fuld dem med ustabilitet
+konflikt_fd <- subset(PITF_data, PITF_data$sftptv2a2 == 1 & PITF_data$sftpcons == 1 & PITF_data$sample == 3)
+konflikt_fd$sftgname
+# "France", "Gambia", "Laos", "Malaysia", "Papua New Guinea", "United Kingdom", "Uruguay"   
+
+# Borgerkrige:
+bogerkrige_fd <- subset(konflikt_fd, konflikt_fd$cwar_ind == "Y")
+
+# Adverse regime changes:
+Adverse_rc_fd <- subset(konflikt_fd, konflikt_fd$reg_ind == "Y")
+
+# Super. Men -> hvilke af disse er endt som andet end demokratier efter (burde være alle med adveres rc, men...)
+# Hvor er venesuela og Chile? er de kun delvise demokratier?
+# Chile ses i dette dataset som pdf, men Venezuela gik fra pd til fd et sted mellem 1970 0g 76.. Hvornår var det sidste fald.
+# Det kunne klæde dig godt med en omskrivning af Polity IV 2015 data..
+
 
 # Forudsigeler (lige nu rod) ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -268,10 +287,9 @@ sort(test_df$test_predict, decreasing = T, test_df$year > 1994)
 str(test_df)
 # tænke pause
 
-# fuld dem med ustabilitet
 
-test_fd_us <- subset(PITF_data, PITF_data$sftptv2a2 == 1 & PITF_data$sftpcons == 1 & PITF_data$sample == 3)
-# jeps
+
+
 
 test_fd_us1 <- subset(test_df, test_df$sftptv2a2 == 1 & test_df$sftpcons == 1)
 
