@@ -161,6 +161,7 @@ summary(model_r3)
 # outputs for modellerne f3, c1 og r3 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 library(stargazer)
+?stargazer
 
 # Reproducere deres model -> de valgte modeller er således (på Goldstones foranledning) f3, c1 og r3
 # Goldstone forklare at det er disse der har "mediean accuracy for each type of instabilitt[...]" s. 196
@@ -212,6 +213,32 @@ out_PITF_or <- stargazer(model_f3, model_c1, model_r3,
 
 # nu INGEN problemer med p-værdierne, efter p.auto = F
 # Spledes en model med odds ratio og korrekte ci; men stadigt ikke samlet model...
+#----------------------------------------
+# Nu kun med model_r3 (ARC) samlet:
+summary(model_r3)$coefficients[,3]
+model_r3_se <- summary(model_r3)$coefficients[,3]
+
+
+out_PITF_or <- stargazer( model_r3, model_r3,
+                         coef = list(model_r3_or),
+                         ci.custom = list(model_r3_ci),
+                         dep.var.labels = "Adverse Regime Change Onsets",
+                         covariate.labels = c("Partial Autocracy",
+                                              "Partial Democracy with Factionalisme",
+                                              "Partial democracy without Factionalism",
+                                              "Full Democracy",
+                                              "Infant Mortality",
+                                              "Armed Conflict in 4+ Bordering States",
+                                              "State-Led Discrimination"),
+                         p.auto = F,
+                         type = "text", 
+                         out="PITF_out_or_r3.htm",
+                         omit = "sftptv2a6",
+                         model.numbers = F,
+                         column.labels = c("Odds ratio(95% CI)","Coef. (S.E.)"))
+
+# Stadig problemer med at få se ind..
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Modeller f3 med FD som ref.cat. ++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -316,7 +343,7 @@ stargazer(model_r3_rc_fd,
                                "Armed Conflict in 4+ Bordering States",
                                "State-Led Discrimination"),
           type = "text", 
-          out="PITF_out_rc_fd.htm",
+          out="PITF_out_r3_rc_fd.htm",
           omit = "sftptv2a6")
 
 # Samme resultat som f3 og c1
@@ -351,13 +378,66 @@ stargazer(model_f3_rc_fd, model_c1_rc_fd, model_r3_rc_fd,
          ci.custom = list(model_f3_rc_fd_ci, model_c1_rc_fd_ci, model_r3_rc_fd_ci),
          p.auto = F,
          type = "text", 
-         out="PITF_out_rc_fd.htm",
+         out="PITF_out_rc_fd_or.htm",
          omit = "sftptv2a6",
          model.numbers = F,
          column.labels = c("Full Problem Set----------","Civil War Onsets-----","Adverse Regime Change Onsets"))
 
 # OR er korrekte og nu også ci. og p efter p.auto = F
 # Modellen er (substansielt set) færdig. nu layout..
+
+# Konstruere din trip, trap træsko model:
+# Nu ARC med kun regime type:------------------------------
+
+model_r3_rc_fd_rt <- clogit(sftpcons ~ sftptv2a3 + 
+                           sftptv2a4 + 
+                           sftptv2a5 + 
+                           sftptv2a1 + # nu full auto a1 i stedet for full demo a2
+                           sftptv2a6 + 
+                           strata(stratidc),
+                         PITF_data, subset = sample==3 & reg_ind=="Y")
+summary(model_r3_rc_fd_rt)
+# CI og og OR:
+
+model_r3_rc_fd_rt_or <- exp(model_r3_rc_fd_rt$coefficients) # odds ratio mr3_rc_df
+model_r3_rc_fd_rt_ci  <- exp(confint(model_r3_rc_fd_rt))
+
+# Nu ARC med regime type og inf. mort.-------------------------------
+model_r3_rc_fd_im <- clogit(sftpcons ~ sftptv2a3 + 
+                           sftptv2a4 + 
+                           sftptv2a5 + 
+                           sftptv2a1 + # nu full auto a1 i stedet for full demo a2
+                           sftptv2a6 + 
+                           logim + 
+                           strata(stratidc),
+                         PITF_data, subset = sample==3 & reg_ind=="Y")
+
+# CI og og OR:
+
+model_r3_rc_fd_im_or <- exp(model_r3_rc_fd_im$coefficients) # odds ratio mr3_rc_df
+model_r3_rc_fd_im_ci  <- exp(confint(model_r3_rc_fd_im))
+
+# Nu kun ARC:-------------------------------------------------
+stargazer(model_r3_rc_fd_rt, model_r3_rc_fd_im, model_r3_rc_fd,
+          covariate.labels = c("Partial Autocracy",
+                               "Partial Democracy with Factionalisme",
+                               "Partial democracy without Factionalism",
+                               "Full Autocracy",
+                               "Infant Mortality",
+                               "Armed Conflict in 4+ Bordering States",
+                               "State-Led Discrimination"),
+          dep.var.labels = "Odds Ratio regarding:",
+          dep.var.caption = "",
+          coef = list(model_r3_rc_fd_rt_or,model_r3_rc_fd_im_or,model_r3_rc_fd_or),
+          ci.custom = list(model_r3_rc_fd_rt_ci,model_r3_rc_fd_im_ci,model_r3_rc_fd_ci),
+          p.auto = F,
+          type = "text", 
+          out="PITF_out_r3_fd_or.htm",
+          omit = "sftptv2a6",
+          model.numbers = F,
+          column.labels = c(""))
+
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -365,15 +445,39 @@ stargazer(model_f3_rc_fd, model_c1_rc_fd, model_r3_rc_fd,
 
 
 
+# ------------------- relativ risks ------------ et desparat forsøg...
+exp(3.61)/(1+exp(3.61))
 
 
 
+exp(3.8)/(1+exp(3.8))
+# = 0.9781187
+
+summary(model_r3_rc_fd)
+exp(0+3.8*1)
+
+44.690/(1+44.690)
+3.800*(0.9781134/1+0.9781134)*(1/1+0.9781134)
 
 
+3.800*0.9781134*(1-0.9781134)
 
 
+16.520/(1+16.520)
 
+?clogit
 
+#beta = 3.800
+
+#odds ratio = 44.690
+
+3.800*(44.690/1+44.690)*(1/1+44.690)
+
+? mfx
+
+logitmfx(model_r3, data = PITF_data)
+
+#-----------------------------
 
 
 model_r3 <- clogit(sftpcons ~ sftptv2a3 + 
@@ -515,4 +619,11 @@ test_df$test_OR <- exp(as.numeric(model_f3$test_predict2))
 test_df$test_OR <- exp(model_f3$coefficients)
 
 (model_f3)
+
+
+
+
+m <- exp(44.69)/(1+exp(44.69))
+
+3.8*44.69*(1-44.69)
 
